@@ -121,6 +121,6 @@ Ifetc32 ifetc(.Instruction_out(Instruction_w),.branch_base_addr(PC_plus_4_w),.Ad
             .Read_data_1(Read_data_1_w),.Branch(Branch_w),.nBranch(nBranch_w),.Jmp(Jmp_w),.Jal(Jal_w),.Jr(Jr_w),.Zero(Zero_w),
             .clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(ram_dat_o_w));
 
-assign led2N4=ram_adr_w[15:0];
+assign led2N4[15:0]=ram_adr_w[15:0];
             
 endmodule
