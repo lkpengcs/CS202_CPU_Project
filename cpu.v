@@ -37,7 +37,7 @@ wire upg_done_o; //Uart rx data have done
 wire [14:0] upg_adr_o; //data to program_rom or dmemory32 
 wire [31:0] upg_dat_o;
 wire spg_bufg; 
-BUFG U1(.key_in(start_pg), .key_out(spg_bufg)); // de-twitter 
+BUFG U1(.clk(fpga_clk), .nrst(fpga_rst), .key_in(start_pg), .key_out(spg_bufg)); // de-twitter 
 // Generate UART Programmer reset signal 
 reg upg_rst; 
 always @ (posedge fpga_clk) 
@@ -48,7 +48,8 @@ begin
         upg_rst = 1; 
 end
 wire rst = fpga_rst | !upg_rst;
-
+wire clk_out1, clk_out2;
+cpuclk clk(.clk_in1(fpga_clk), .clk_out1(clk_out1), .clk_out2(clk_out2));
 
 //uartµÄwires
 wire upg_clk_w; //Á´½Ódmemory32
