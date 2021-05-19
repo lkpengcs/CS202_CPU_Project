@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Ifetc32(Instruction,branch_base_addr,Addr_result,
+module Ifetc32(Instruction_out,branch_base_addr,Addr_result,
             Read_data_1,Branch,nBranch,Jmp,Jal,Jr,Zero,
-            clock,reset,link_addr,pco, Instruction_o); 
-output[31:0] Instruction; // the instruction fetched from this module 
+            clock,reset,link_addr,pco, Instruction); 
+output[31:0] Instruction_out; // the instruction fetched from this module 
 output[31:0] branch_base_addr; // (pc+4) to ALU which is used by branch type instruction 
 output reg [31:0] link_addr; // (pc+4) to decoder which is used by jal instruction 
 output[31:0] pco;
@@ -39,7 +39,7 @@ input nBranch; // while nBranch is 1,it means current instruction is bnq
 input Jmp; // while Jmp 1,it means current instruction is jump 
 input Jal; // while Jal is 1,it means current instruction is jal 
 input Jr; // while Jr is 1,it means current instruction is jr
-input [31:0] Instruction_o;
+input [31:0] Instruction;
 reg[31:0] PC, Next_PC; 
 always @* begin 
     if(((Branch == 1) && (Zero == 1 )) || ((nBranch == 1) && (Zero == 0))) // beq, bne 
@@ -61,4 +61,5 @@ begin
 end
 assign branch_base_addr = PC + 4;
 assign pco = PC;
+assign Instruction_out = Instruction;
 endmodule
