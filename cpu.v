@@ -48,8 +48,9 @@ begin
         upg_rst = 1; 
 end
 wire rst = fpga_rst | !upg_rst;
-wire clk_out1, clk_out2;
-cpuclk clk(.clk_in1(fpga_clk), .clk_out1(clk_out1), .clk_out2(clk_out2));
+
+cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk), .clk_out2(clk_out2));
+//////////////////////////////////23                10
 
 //uart的wires
 wire upg_clk_w; //链接dmemory32
@@ -60,12 +61,12 @@ wire upg_done_w; //链接dmemory32
 wire upg_tx=tx;
 wire upg_rx=rx;
 
-uart_bmpg_0 uart(.upg_clk_i(upg_clk),.upg_rst_i(upg_rst),.upg_rx_i(upg_rx),
+uart_bmpg_0 uart(.upg_clk_i(clk_out2),.upg_rst_i(upg_rst),.upg_rx_i(upg_rx),
 .upg_clk_o(upg_clk_w),.upg_wen_o(upg_wen_w),.upg_adr_o(upg_adr_w),.upg_dat_o(upg_dat_w),
 .upg_done_o(upg_done_w),.upg_tx_o(upg_tx));
 
 //dmeory32的wires
-wire cpu_clk;
+wire cpu_clk=upg_clk;
 wire ram_wen_w;//链接controller
 wire[13:0] ram_adr_w;//链接ALU的alu_result
 wire[31:0] ram_dat_i_w;//链接decoder的read_data_2
