@@ -21,7 +21,7 @@
 
 
 module control32(
-Opcode, Function_opcode, Jr, RegDST, RegDST, ALUSrc, MemtoReg, RegWrite, MemWrite, Branch, nBranch, Jmp, Jal, I_format, Sftmd, ALUOp
+Opcode, Function_opcode, Jr, RegDST, ALUSrc, MemtoReg, RegWrite, MemWrite, Branch, nBranch, Jmp, Jal, I_format, Sftmd, ALUOp
     );
 input[5:0] Opcode; // instruction[31..26] 
 input[5:0] Function_opcode; // instructions[5..0] 

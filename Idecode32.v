@@ -65,7 +65,7 @@ begin
         end
 end
 
-always @ (reset, posedge clock)
+always @ (posedge clock)
 begin
     if (reset)
     begin

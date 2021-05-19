@@ -30,6 +30,7 @@ input rx,
 output tx
     );
 // UART Programmer Pinouts 
+
 wire upg_clk, upg_clk_o; 
 wire upg_wen_o; //Uart write out enable 
 wire upg_done_o; //Uart rx data have done 
@@ -67,10 +68,10 @@ uart_bmpg_0 uart(.upg_clk_i(upg_clk_o),.upg_rst_i(upg_rst),.upg_rx_i(upg_rx),
 //dmeory32的wires
 wire cpu_clk=upg_clk;
 wire ram_wen_w;//链接controller
-wire[13:0] ram_adr_w;//链接ALU的alu_result
+wire[31:0] ram_adr_w;//链接ALU的alu_result
 wire[31:0] ram_dat_i_w;//链接decoder的read_data_2
 wire[31:0] ram_dat_o_w;//bind ifetc
-dmemory32_0 mem(.ram_clk_i(cpu_clk),.ram_wen_i(ram_wen_w),.ram_adr_i(ram_adr_w),
+dmemory32 mem(.ram_clk_i(cpu_clk),.ram_wen_i(ram_wen_w),.ram_adr_i(ram_adr_w),
 .ram_dat_i(ram_dat_i_w),.ram_dat_o(ram_dat_o_w),.upg_rst_i(upg_rst),.upg_clk_i(upg_clk_w),
 .upg_wen_i(upg_wen_w),.upg_adr_i(upg_adr_w),.upg_dat_i(upg_dat_w),.upg_done_i(upg_done_w));
 
@@ -120,4 +121,6 @@ Ifetc32 ifetc(.Instruction_out(Instruction_w),.branch_base_addr(PC_plus_4_w),.Ad
             .Read_data_1(Read_data_1_w),.Branch(Branch_w),.nBranch(nBranch_w),.Jmp(Jmp_w),.Jal(Jal_w),.Jr(Jr_w),.Zero(Zero_w),
             .clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(ram_dat_o_w));
 
+assign led2N4=ram_adr_w[15:0];
+            
 endmodule

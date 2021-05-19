@@ -48,11 +48,11 @@ always @* begin
     else if ((Jmp == 1) || (Jal == 1)) Next_PC = {PC[31:28], Instruction[25:0], 2'b00};
     else Next_PC = PC + 4; // PC+4 
 end 
-always @(reset, negedge clock) begin 
+always @( negedge clock) begin 
     if(reset == 1) PC <= 32'h0000_0000; 
     else PC <= Next_PC; 
 end
-always @(Jal, Jmp, negedge clock)
+always @( negedge clock)
 begin
     if ((Jmp == 1) || (Jal == 1)) 
         link_addr <= (PC + 4) >> 2;
