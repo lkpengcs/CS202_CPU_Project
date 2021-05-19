@@ -21,6 +21,7 @@
 
 
 module BUFG(
+    input wire clk, nrst,
     input wire key_in,
     output reg key_out
     );
