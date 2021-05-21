@@ -135,10 +135,7 @@ Idecode32 decode(
 Ifetc32 ifetc(.Instruction_out(Instruction_w),.branch_base_addr(PC_plus_4_w),.Addr_result(Addr_result_w),
             .Read_data_1(Read_data_1_w),.Branch(Branch_w),.nBranch(nBranch_w),.Jmp(Jmp_w),.Jal(Jal_w),.Jr(Jr_w),.Zero(Zero_w),
             .clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(Instruction_o_w));
-wire IOWrite=1;
-wire [23:0]led2N44;
-leds led(.led_clk(cpu_clk), .ledrst(rst), .ledwrite(IOWrite), .ledcs(IOWrite),
- .ledaddr(ram_adr_w[1:0]),.ledwdata(ram_dat_i_w[15:0]), .ledout(led2N44));
+            
 
 reg o;
 reg o1;
