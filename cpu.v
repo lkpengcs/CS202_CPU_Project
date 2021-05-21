@@ -30,7 +30,6 @@ input rx,
 output tx
     );
 // UART Programmer Pinouts 
-
 wire upg_clk, upg_clk_o; 
 wire upg_wen_o; //Uart write out enable 
 wire upg_done_o; //Uart rx data have done 
@@ -38,7 +37,8 @@ wire upg_done_o; //Uart rx data have done
 wire [14:0] upg_adr_o; //data to program_rom or dmemory32 
 wire [31:0] upg_dat_o;
 wire spg_bufg; 
-BUFG U1(.clk(fpga_clk), .nrst(fpga_rst), .key_in(start_pg), .key_out(spg_bufg)); // de-twitter 
+//BUFG1 U1(.clk(fpga_clk), .nrst(fpga_rst), .key_in(start_pg), .key_out(spg_bufg)); // de-twitter 
+BUFG U1(.I(start_pg), .O(spg_bufg)); // de-twitter
 // Generate UART Programmer reset signal 
 reg upg_rst; 
 always @ (posedge fpga_clk) 
@@ -50,8 +50,13 @@ begin
 end
 wire rst = fpga_rst | !upg_rst;
 
-cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk),.clk_out2(upg_clk_o));
+wire upg_clk1;
+cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk1),.clk_out2(upg_clk_o));
 //////////////////////////////////23                10
+
+reg[24:0] low_clk;
+always @(posedge upg_clk1)low_clk=low_clk+1;
+assign upg_clk=low_clk[24];
 
 //uart的wires
 wire upg_clk_w; //链接dmemory32
@@ -59,21 +64,32 @@ wire upg_wen_w; //链接dmemory32
 wire[14:0] upg_adr_w; //链接dmemory32
 wire[31:0] upg_dat_w; //链接dmemory32 and decoder
 wire upg_done_w; //链接dmemory32
-wire upg_tx=tx;
-wire upg_rx=rx;
-uart_bmpg_0 uart(.upg_clk_i(upg_clk_o),.upg_rst_i(upg_rst),.upg_rx_i(upg_rx),
-.upg_clk_o(upg_clk_w),.upg_wen_o(upg_wen_w),.upg_adr_o(upg_adr_w),.upg_dat_o(upg_dat_w),
-.upg_done_o(upg_done_w),.upg_tx_o(upg_tx));
+
+uart_bmpg_0 uart(.upg_clk_i(upg_clk_o),.upg_rst_i(upg_rst),.upg_rx_i(rx),
+.upg_clk_o(upg_clk_w),.upg_wen_o(upg_wen_w),.upg_adr_o(upg_adr_w),
+.upg_dat_o(upg_dat_w),.upg_done_o(upg_done_w),.upg_tx_o(tx));
+
+wire cpu_clk=upg_clk;
+
 
 //dmeory32的wires
-wire cpu_clk=upg_clk;
 wire ram_wen_w;//链接controller
 wire[31:0] ram_adr_w;//链接ALU的alu_result
 wire[31:0] ram_dat_i_w;//链接decoder的read_data_2
-wire[31:0] ram_dat_o_w;//bind ifetc
+wire[31:0] ram_dat_o_w;//
 dmemory32 mem(.ram_clk_i(cpu_clk),.ram_wen_i(ram_wen_w),.ram_adr_i(ram_adr_w),
 .ram_dat_i(ram_dat_i_w),.ram_dat_o(ram_dat_o_w),.upg_rst_i(upg_rst),.upg_clk_i(upg_clk_w),
-.upg_wen_i(upg_wen_w),.upg_adr_i(upg_adr_w),.upg_dat_i(upg_dat_w),.upg_done_i(upg_done_w));
+.upg_wen_i(upg_wen_w&upg_adr_w[14]),.upg_adr_i(upg_adr_w),.upg_dat_i(upg_dat_w),.upg_done_i(upg_done_w));
+
+
+//programrom的wires
+wire[31:0] rom_adr_w;//
+wire[31:0] Instruction_o_w;//
+wire[31:0] pco_w;
+
+programrom pro(.rom_clk_i(cpu_clk),.rom_adr_i(pco_w),.Instruction_o(Instruction_o_w),
+.upg_rst_i(upg_rst),.upg_clk_i(upg_clk_w),.upg_wen_i(upg_wen_w&!upg_adr_w[14]),
+.upg_adr_i(upg_adr_w),.upg_dat_i(upg_dat_w),.upg_done_i(upg_done_w));
 
 wire [31:0] Instruction_w;//bind ifetc alu
 
@@ -112,15 +128,24 @@ Executs32 executs(.Read_data_1(Read_data_1_w), .Read_data_2(ram_dat_i_w), .Imme_
 
 wire [31:0] opcplus4_w;//bind ifetc
 Idecode32 decode(
-.Instruction(Instruction_w), .read_data(upg_dat_w), .ALU_result(ram_adr_w), .Jal(Jal_w),
+.Instruction(Instruction_w), .read_data(ram_dat_o_w), .ALU_result(ram_adr_w), .Jal(Jal_w),
 .RegWrite(RegWrite_w), .MemtoReg(MemtoReg_w), .RegDst(RegDST_w), .clock(cpu_clk), .reset(rst), .opcplus4(opcplus4_w),
 .read_data_1(Read_data_1_w), .read_data_2(ram_dat_i_w), .imme_extend(Imme_extend_w));
 
-wire[31:0] pco_w;
 Ifetc32 ifetc(.Instruction_out(Instruction_w),.branch_base_addr(PC_plus_4_w),.Addr_result(Addr_result_w),
             .Read_data_1(Read_data_1_w),.Branch(Branch_w),.nBranch(nBranch_w),.Jmp(Jmp_w),.Jal(Jal_w),.Jr(Jr_w),.Zero(Zero_w),
-            .clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(ram_dat_o_w));
+            .clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(Instruction_o_w));
+wire IOWrite=1;
+wire [23:0]led2N44;
+leds led(.led_clk(cpu_clk), .ledrst(rst), .ledwrite(IOWrite), .ledcs(IOWrite),
+ .ledaddr(ram_adr_w[1:0]),.ledwdata(ram_dat_i_w[15:0]), .ledout(led2N44));
 
-assign led2N4[15:0]=ram_adr_w[15:0];
-            
+reg o;
+reg o1;
+always @(posedge fpga_clk)begin
+o=ram_adr_w[25];
+o1=upg_done_w;
+end
+
+ assign led2N4={ram_adr_w[18:0],o,rx,o1,upg_rst,upg_clk};
 endmodule

@@ -41,6 +41,7 @@ input Jal; // while Jal is 1,it means current instruction is jal
 input Jr; // while Jr is 1,it means current instruction is jr
 input [31:0] Instruction;
 reg[31:0] PC, Next_PC; 
+
 always @* begin 
     if(((Branch == 1) && (Zero == 1 )) || ((nBranch == 1) && (Zero == 0))) // beq, bne 
         Next_PC = Addr_result << 2; // the calculated new value for PC 
