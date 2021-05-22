@@ -27,8 +27,13 @@ input [23:0]switch2N4,
 output [23:0]led2N4,
 input start_pg,
 input rx,
-output tx
-    );
+output tx,
+output [7:0] segment_led,
+output [7:0] seg_en
+);
+
+
+
 // UART Programmer Pinouts 
 wire upg_clk, upg_clk_o; 
 wire upg_wen_o; //Uart write out enable 
@@ -58,6 +63,12 @@ reg[24:0] low_clk;
 always @(posedge upg_clk1)low_clk=low_clk+1;
 assign upg_clk=low_clk[24];
 
+
+wire clkout=low_clk[22];
+wire [31:0] data;
+assign data=led2N4;
+//frequency_divider #(100_000)divider2(fpga_clk,fpga_rst,clkout);
+segment seg(.clk(clkout),.rst(fpga_rst),.in(data),.segment_led(segment_led),.seg_en(seg_en));
 //uartµÄwires
 wire upg_clk_w; //Á´½Ódmemory32
 wire upg_wen_w; //Á´½Ódmemory32
@@ -130,7 +141,8 @@ wire [31:0] input_t9;
 wire use_outter_t9;
 assign input_t9=switch2N4[22:0];
 assign use_outter_t9=switch2N4[23];
-assign led2N4=show_t8[23:0];//PC_plus_4_w[23:0];//
+assign led2N4=show_t8[23:0];
+//{upg_rst,RegWrite_w,MemtoReg_w,RegDST_w,Instruction_w[26:11],show_t8[2:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]
 
 wire [31:0] opcplus4_w;//bind ifetc
 Idecode32 decode(
