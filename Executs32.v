@@ -60,7 +60,7 @@ wire[5:0] Exe_code;
 // use to generate ALU_ctrl. (I_format==0) ? Function_opcode : { 3'b000 , Opcode[2:0] }; 
 wire[2:0] ALU_ctl; 
 // the control signals which affact operation in ALU directely 
-wire[2:0] Sftm; 
+wire[5:0] Sftm; 
 // identify the types of shift instruction, equals to Function_opcode[2:0] 
 reg[31:0] ALU_output_mux; 
 // the result of arithmetic or logic calculation 
@@ -69,13 +69,16 @@ reg[31:0] Shift_Result;
 wire[32:0] Branch_Addr; 
 // the calculated address of the instruction, Addr_Result is Branch_Addr[31:0]
 
+reg [31:0] lo;
+reg [31:0] hi;
+
 assign Ainput = Read_data_1; 
 assign Binput = (ALUSrc == 0) ? Read_data_2 : Imme_extend[31:0];
 assign Exe_code = (I_format==0) ? Function_opcode : { 3'b000 , opcode[2:0] };
 assign ALU_ctl[0] = (Exe_code[0] | Exe_code[3]) & ALUOp[1]; 
 assign ALU_ctl[1] = ((!Exe_code[2]) | (!ALUOp[1])); 
 assign ALU_ctl[2] = (Exe_code[1] & ALUOp[1]) | ALUOp[0];
-assign Sftm = Function_opcode[2:0];
+assign Sftm = Function_opcode[5:0];
 
 always @ (ALU_ctl or Ainput or Binput)
 begin case (ALU_ctl)
@@ -90,16 +93,35 @@ begin case (ALU_ctl)
     default:ALU_output_mux = 32'h00000000; 
 endcase 
 end
-
 always @* begin 
     if(Sftmd) 
-        case(Sftm[2:0]) 
-            3'b000:Shift_Result = Binput << Shamt; //Sll rd,rt,shamt 00000 
-            3'b010:Shift_Result = Binput >> Shamt; //Srl rd,rt,shamt 00010 
-            3'b100:Shift_Result = Binput << Ainput; //Sllv rd,rt,rs 000100 
-            3'b110:Shift_Result = Binput >> Ainput; //Srlv rd,rt,rs 000110 
-            3'b011:Shift_Result = $signed(Binput) >>> Shamt; //Sra rd,rt,shamt 00011 
-            3'b111:Shift_Result = $signed(Binput) >>> Ainput; //Srav rd,rt,rs 00111 
+        case(Sftm[5:0]) 
+            6'b0000:Shift_Result = Binput << Shamt; //Sll rd,rt,shamt 00000 
+            6'b0010:Shift_Result = Binput >> Shamt; //Srl rd,rt,shamt 00010 
+            6'b0100:Shift_Result = Binput << Ainput; //Sllv rd,rt,rs 000100 
+            6'b0110:Shift_Result = Binput >> Ainput; //Srlv rd,rt,rs 000110 
+            6'b0011:Shift_Result = $signed(Binput) >>> Shamt; //Sra rd,rt,shamt 00011 
+            6'b0111:Shift_Result = $signed(Binput) >>> Ainput; //Srav rd,rt,rs 00111 
+            6'b11010:begin//div rs rt
+            hi=(Ainput % Binput);
+            lo=(Ainput / Binput);
+            end
+            6'b11000:begin//mult rs rt
+            {hi,lo}=Binput * Ainput;
+            end
+            6'b10000:begin//mfhi rd
+            Shift_Result = hi;
+            end
+            6'b10010:begin//mflo rd
+            Shift_Result = lo;
+            end
+            6'b10001:begin//mthi  rs
+            hi = Ainput;
+            end
+            6'b10011:begin//mtlo  rs
+            lo = Ainput;
+            end
+
             default:Shift_Result = Binput; 
         endcase 
     else Shift_Result = Binput; 

@@ -57,5 +57,8 @@ assign MemWrite = Sw;
 assign I_format = (Opcode[5:3]==3'b001) ? 1'b1:1'b0;
 assign ALUSrc = (I_format || Lw || Sw) ? 1'b1 : 1'b0;
 assign ALUOp = {(R_format || I_format),(Branch || nBranch)};
-assign Sftmd = (((Function_opcode==6'b000000)||(Function_opcode==6'b000010) ||(Function_opcode==6'b000011)||(Function_opcode==6'b000100) ||(Function_opcode==6'b000110)||(Function_opcode==6'b000111)) && R_format)? 1'b1:1'b0;
+assign Sftmd = (((Function_opcode==6'b000000)||(Function_opcode==6'b000010) ||(Function_opcode==6'b000011)
+                ||(Function_opcode==6'b000100) ||(Function_opcode==6'b000110)||(Function_opcode==6'b000111)
+                ||(Function_opcode==6'b011010) ||(Function_opcode==6'b011000)||(Function_opcode==6'b010000)
+                ||(Function_opcode==6'b010010) ||(Function_opcode==6'b010001)||(Function_opcode==6'b010011)) && R_format)? 1'b1:1'b0;
 endmodule
