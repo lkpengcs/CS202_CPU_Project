@@ -59,14 +59,13 @@ wire upg_clk1;
 cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk1),.clk_out2(upg_clk_o));
 //////////////////////////////////23                10
 
-reg[24:0] low_clk;
+reg[19:0] low_clk;
 always @(posedge upg_clk1)low_clk=low_clk+1;
-assign upg_clk=low_clk[24];
+assign upg_clk=low_clk[19];
 
 
 wire clkout=low_clk[12];
 wire [31:0] data;
-assign data=switch2N4;
 //frequency_divider #(100_000)divider2(fpga_clk,fpga_rst,clkout);
 segment seg(.clk(clkout),.rst(fpga_rst),.in(data),.segment_led(segment_led),.seg_en(seg_en));
 //uartµÄwires
@@ -142,6 +141,7 @@ wire use_outter_t9;
 assign input_t9=switch2N4[22:0];
 assign use_outter_t9=switch2N4[23];
 assign led2N4=show_t8[23:0];
+assign data=Instruction_o_w;
 //{upg_rst,RegWrite_w,MemtoReg_w,RegDST_w,Instruction_w[26:11],show_t8[2:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]
 
 wire [31:0] opcplus4_w;//bind ifetc

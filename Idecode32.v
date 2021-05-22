@@ -34,12 +34,12 @@ always @(posedge clock) begin
     for(i=0;i<=31;i=i+1) 
         register[i] <= 32'b0;
     end
-    if(outter_input) register[25]<=outter_t9;
     else begin
+        ram_reg_o<= register[24];
+        if(outter_input) register[25]<=outter_t9;
         write_reg = (6'b000011 == opcode & Jal)?5'b11111:(RegDst)?rd:rt;
         if((RegWrite | Jal) & write_reg != 0) begin
             register[write_reg] <= ((6'b000011 == opcode && 1'b1 == Jal)?opcplus4:(MemtoReg?read_data:ALU_result));
-            ram_reg_o<= ALU_result;
         end
     end
 end
