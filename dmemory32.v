@@ -41,7 +41,7 @@ wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
 RAM ram ( 
 .clka (kickOff ? ram_clk : upg_clk_i), 
 .wea (kickOff ? ram_wen_i : upg_wen_i), 
-.addra (kickOff ? ram_adr_i/4 : upg_adr_i), 
+.addra (kickOff ? ram_adr_i : upg_adr_i), 
 .dina (kickOff ? ram_dat_i : upg_dat_i), 
 .douta (ram_dat_o) );
 endmodule
