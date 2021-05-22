@@ -64,7 +64,7 @@ always @(posedge upg_clk1)low_clk=low_clk+1;
 assign upg_clk=low_clk[24];
 
 
-wire clkout=low_clk[0];
+wire clkout=low_clk[12];
 wire [31:0] data;
 assign data=switch2N4;
 //frequency_divider #(100_000)divider2(fpga_clk,fpga_rst,clkout);

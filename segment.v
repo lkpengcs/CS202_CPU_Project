@@ -61,7 +61,7 @@ output reg [7:0] seg_en//enable signal for seven segment tube
      reg[3:0] select_cnt = 0;
      always@(posedge clk)
      begin
-         if(!rst)
+         if(rst)
          begin
              select_cnt=1'b0;
          end
@@ -77,7 +77,7 @@ output reg [7:0] seg_en//enable signal for seven segment tube
      
      always@(posedge clk)
      begin
-        if(rst)
+        if(!rst)
             case(select_cnt)
                 4'd1:
                 begin
@@ -114,7 +114,7 @@ output reg [7:0] seg_en//enable signal for seven segment tube
                     seg_en = 8'b11111101;
                     segment_led = seg[div_data[1]];
                 end
-                4'd7:
+                4'd8:
                 begin
                     seg_en = 8'b11111110;
                     segment_led = seg[div_data[0]];

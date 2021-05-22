@@ -36,10 +36,10 @@ always @(posedge clock) begin
     end
     if(outter_input) register[25]<=outter_t9;
     else begin
-        write_reg = (6'b000011 == opcode && Jal)?5'b11111:(RegDst)?rd:rt;
-        if((RegWrite || Jal) && write_reg != 0) begin
+        write_reg = (6'b000011 == opcode & Jal)?5'b11111:(RegDst)?rd:rt;
+        if((RegWrite | Jal) & write_reg != 0) begin
             register[write_reg] <= ((6'b000011 == opcode && 1'b1 == Jal)?opcplus4:(MemtoReg?read_data:ALU_result));
-            ram_reg_o<= (MemtoReg?read_data:ALU_result);
+            ram_reg_o<= ALU_result;
         end
     end
 end
