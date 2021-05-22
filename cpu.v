@@ -64,9 +64,9 @@ always @(posedge upg_clk1)low_clk=low_clk+1;
 assign upg_clk=low_clk[24];
 
 
-wire clkout=low_clk[22];
+wire clkout=low_clk[0];
 wire [31:0] data;
-assign data=led2N4;
+assign data=switch2N4;
 //frequency_divider #(100_000)divider2(fpga_clk,fpga_rst,clkout);
 segment seg(.clk(clkout),.rst(fpga_rst),.in(data),.segment_led(segment_led),.seg_en(seg_en));
 //uartµÄwires
