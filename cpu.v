@@ -61,7 +61,7 @@ cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk1),.clk_out2(upg_clk_o));
 
 reg[19:0] low_clk;
 always @(posedge upg_clk1)low_clk=low_clk+1;
-assign upg_clk=low_clk[19];
+assign upg_clk=upg_clk1;//low_clk[19];
 
 
 wire clkout=low_clk[12];
@@ -141,7 +141,7 @@ wire use_outter_t9;
 assign input_t9=switch2N4[22:0];
 assign use_outter_t9=switch2N4[23];
 assign led2N4=show_t8[23:0];
-assign data=Instruction_o_w;
+assign data=show_t8;//=Instruction_o_w;
 //{upg_rst,RegWrite_w,MemtoReg_w,RegDST_w,Instruction_w[26:11],show_t8[2:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]
 
 wire [31:0] opcplus4_w;//bind ifetc
@@ -153,13 +153,6 @@ Idecode32 decode(
 Ifetc32 ifetc(.Instruction_out(Instruction_w),.branch_base_addr(PC_plus_4_w),.Addr_result(Addr_result_w),
 .Read_data_1(Read_data_1_w),.Branch(Branch_w),.nBranch(nBranch_w),.Jmp(Jmp_w),.Jal(Jal_w),.Jr(Jr_w),.Zero(Zero_w),
 .clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(Instruction_o_w));
-            
 
-reg o;
-reg o1;
-always @(posedge fpga_clk)begin
-o=ram_adr_w[25];
-o1=upg_done_w;
-end
 
 endmodule
