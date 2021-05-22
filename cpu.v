@@ -27,8 +27,13 @@ input [23:0]switch2N4,
 output [23:0]led2N4,
 input start_pg,
 input rx,
-output tx
-    );
+output tx,
+output [7:0] segment_led,
+output [7:0] seg_en
+);
+
+
+
 // UART Programmer Pinouts 
 wire upg_clk, upg_clk_o; 
 wire upg_wen_o; //Uart write out enable 
@@ -54,10 +59,15 @@ wire upg_clk1;
 cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk1),.clk_out2(upg_clk_o));
 //////////////////////////////////23                10
 
-reg[24:0] low_clk;
+reg[19:0] low_clk;
 always @(posedge upg_clk1)low_clk=low_clk+1;
-assign upg_clk=low_clk[24];
+assign upg_clk=upg_clk1;//low_clk[19];
 
+
+wire clkout=low_clk[12];
+wire [31:0] data;
+//frequency_divider #(100_000)divider2(fpga_clk,fpga_rst,clkout);
+segment seg(.clk(clkout),.rst(fpga_rst),.in(data),.segment_led(segment_led),.seg_en(seg_en));
 //uartµÄwires
 wire upg_clk_w; //Á´½Ódmemory32
 wire upg_wen_w; //Á´½Ódmemory32
@@ -125,27 +135,24 @@ Executs32 executs(.Read_data_1(Read_data_1_w), .Read_data_2(ram_dat_i_w), .Imme_
 .Shamt(Shamt_w), .ALUSrc(ALUSrc_w), .I_format(I_format_w), .Zero(Zero_w), .Sftmd(Sftmd_w),
 .ALU_Result(ram_adr_w), .Addr_Result(Addr_result_w), .PC_plus_4(PC_plus_4_w), .Jr(Jr_w));
 
+wire [31:0] show_t8;
+wire [31:0] input_t9;
+wire use_outter_t9;
+assign input_t9=switch2N4[22:0];
+assign use_outter_t9=switch2N4[23];
+assign led2N4=show_t8[23:0];
+assign data=show_t8;//=Instruction_o_w;
+//{upg_rst,RegWrite_w,MemtoReg_w,RegDST_w,Instruction_w[26:11],show_t8[2:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]
 
 wire [31:0] opcplus4_w;//bind ifetc
 Idecode32 decode(
-.Instruction(Instruction_w), .read_data(ram_dat_o_w), .ALU_result(ram_adr_w), .Jal(Jal_w),
-.RegWrite(RegWrite_w), .MemtoReg(MemtoReg_w), .RegDst(RegDST_w), .clock(cpu_clk), .reset(rst), .opcplus4(opcplus4_w),
-.read_data_1(Read_data_1_w), .read_data_2(ram_dat_i_w), .imme_extend(Imme_extend_w));
+.Instruction(Instruction_w), .read_data(ram_dat_o_w), .ALU_result(ram_adr_w), .Jal(Jal_w),.RegWrite(RegWrite_w),
+.MemtoReg(MemtoReg_w), .RegDst(RegDST_w), .clock(cpu_clk), .reset(rst), .opcplus4(opcplus4_w),.read_data_1(Read_data_1_w),
+.read_data_2(ram_dat_i_w), .imme_extend(Imme_extend_w),.ram_reg_o(show_t8),.outter_input(use_outter_t9),.outter_t9(input_t9));
 
 Ifetc32 ifetc(.Instruction_out(Instruction_w),.branch_base_addr(PC_plus_4_w),.Addr_result(Addr_result_w),
-            .Read_data_1(Read_data_1_w),.Branch(Branch_w),.nBranch(nBranch_w),.Jmp(Jmp_w),.Jal(Jal_w),.Jr(Jr_w),.Zero(Zero_w),
-            .clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(Instruction_o_w));
-wire IOWrite=1;
-wire [23:0]led2N44;
-leds led(.led_clk(cpu_clk), .ledrst(rst), .ledwrite(IOWrite), .ledcs(IOWrite),
- .ledaddr(ram_adr_w[1:0]),.ledwdata(ram_dat_i_w[15:0]), .ledout(led2N44));
+.Read_data_1(Read_data_1_w),.Branch(Branch_w),.nBranch(nBranch_w),.Jmp(Jmp_w),.Jal(Jal_w),.Jr(Jr_w),.Zero(Zero_w),
+.clock(cpu_clk),.reset(rst),.link_addr(opcplus4_w),.pco(pco_w), .Instruction(Instruction_o_w));
 
-reg o;
-reg o1;
-always @(posedge fpga_clk)begin
-o=ram_adr_w[25];
-o1=upg_done_w;
-end
 
- assign led2N4={ram_adr_w[18:0],o,rx,o1,upg_rst,upg_clk};
 endmodule
