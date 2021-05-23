@@ -1,11 +1,97 @@
 .data
-.str: .asciiz	"9834876DCFB05CB167A5C24953EBA58C"
+.str: .asciiz	"0834876DCFB05CB167A5C24953EBA58C"
 string	: .space 1024
 temp	: .space 1024
 rec	: .word 0x00
 .text 
 start:
+nop
+gene:
+	addiu $t5,$25,0
+	lui $t1,4097
+	ori $t2,$t1,1057
+	#la $t2,string#############################
+	LOOP3:
+		srl $20,$t5,1	#($t5 >> 1) 
+		srl $18,$t5,2	#($t5 >> 2);
+		addu $22,$18,$20	#$22 = ($t5 >> 1) + ($t5 >> 2);
+		srl $18,$22,4	#($22 >> 4);
+		addu $22,$22,$18	#$22 = $22 + ($22 >> 4);
+		srl $18,$22,8
+		addu $22,$22,$18	#$22 = $22 + ($22 >> 8);
+		srl $18,$22,16
+		addu $22,$22,$18	#$22 = $22 + ($22 >> 16);
+		srl $22,$22,3	#$22 = $22 >> 3;
+		sll $18,$22,2
+		addu $18,$18,$22
+		sll $18,$18,1
+		subu $23,$t5,$18		 #$23 = $t5 - ((($22 << 2) + $22) << 1);
+addiu $1,$0,1
+subu $1,$23,$1
+slti $1,$1,9
+bne $1,$0,sjmp1
+		addiu $22,$22,1
+		sjmp1:
+		addu $t6,$22,$zero	#t6=$22 + ($23 > 9);
+		addu $t5,$t6,$zero
+		sll $22,$t6,3
+		sll $t6,$t6,1
+		addu $t6,$t6,$22
+		subu $t6,$t5,$t6
+
+		addiu $t6, $t6, 48
+
+        or    $23,$t6,$zero  #paramater 1
+	addiu   $22,$t2,0     #paramater 0 2
+	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
+	lw	$28, 0($18)
+	sll	$20,$20,3	
+    	addiu	$21,$zero,255	#init 14
+    	sllv 	$21,$21,$20
+    	nor	$21,$21,$zero	#14  11110000111111111
+    	and	$21,$28,$21	#14  0101000010101010
+    	sllv 	$22,$23,$20	
+    	or	$22,$22,$21
+    	sw	$22,0($18)	#paramater 2
+        or $t6,$23,$zero #paramater 1
+
+		addiu $t2, $t2, 1
+		bgtz $t5, LOOP3
+  ori $t6,$t1,1057
+ # la $t6,.str#########################################################
+	REVERSE:
+  addiu $11,$0,1
+	subu $t2, $t2, $11
+	andi $13,$t2,3
+    srl	$11,$t2,2
+    sll	$11,$11,2
+	lw	$11, 0($11)
+	sll $13,$13,3
+    	srlv 	$1,$11,$13
+    	andi 	$t7,$1,255
+		
+        or    $23,$t7,$zero  #paramater 1
+	addiu   $22,$t1,0     #paramater 0 2
+	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
+	lw	$28, 0($18)
+	sll	$20,$20,3	
+    	addiu	$21,$zero,255	#init 14
+    	sllv 	$21,$21,$20
+    	nor	$21,$21,$zero	#14  11110000111111111
+    	and	$21,$28,$21	#14  0101000010101010
+    	sllv 	$22,$23,$20	
+    	or	$22,$22,$21
+    	sw	$22,0($18)	#paramater 2
+        or $t7,$23,$zero #paramater 1
+        
+		addiu $t1, $t1, 1
+		bne $t6, $t2, REVERSE
 	j main
+
 ROTR:                                   # @ROTR
 	addiu $29, $29, -24
 	addu	$1,$zero,$5
@@ -117,90 +203,6 @@ MAJ:                                    # @MAJ
 	addiu	$29, $29, 32
 	jr	$ra
 	nop
-gene:
-	lui $t1,4097
-	addiu $t5,$25,0
-	lui $1,4097
-	ori $t2,$1,1057
-	LOOP3:
-		addi $t7, $zero, 10
-		div $t5, $t7
-		mfhi $t6
-		addi $t6, $t6, 48
-
-        mfhi	$26
-        mflo	$27
-        or    $23,$t6,$zero  #paramater 1
-	addiu   $22,$t2,0     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
-	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20	
-    	addiu	$21,$zero,255	#init 14
-    	sllv 	$21,$21,$20
-    	nor	$21,$21,$zero	#14  11110000111111111
-    	and	$21,$28,$21	#14  0101000010101010
-    	sllv 	$22,$23,$20	
-    	or	$22,$22,$21
-    	sw	$22,0($18)	#paramater 2
-        or $t6,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
-
-		addi $t2, $t2, 1
-		mflo $t5
-		bgtz $t5, LOOP3
-	lui $1,4097
-	ori $t6,$1,1057
-	REVERSE:
-	addi $t2, $t2, -1
-    	addiu 	$12,$zero,4
-    	div 	$t2,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
-	lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	mult	$13,$12
-    	mflo	$13
-    	srlv 	$1,$11,$13
-    	andi 	$t7,$1,255
-		
-        mfhi	$26
-        mflo	$27
-        or    $23,$t7,$zero  #paramater 1
-	addiu   $22,$t1,0     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
-	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20	
-    	addiu	$21,$zero,255	#init 14
-    	sllv 	$21,$21,$20
-    	nor	$21,$21,$zero	#14  11110000111111111
-    	and	$21,$28,$21	#14  0101000010101010
-    	sllv 	$22,$23,$20	
-    	or	$22,$22,$21
-    	sw	$22,0($18)	#paramater 2
-        or $t7,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
-        
-		addi $t1, $t1, 1
-		bne $t6, $t2, REVERSE
-	j main
 
 main:                                   # @main
 	addiu	$29, $29, -192
@@ -220,18 +222,14 @@ BB4_1:                                 # =>This Inner Loop Header: Depth=1
 	lw	$2, 168($30)
 	addu	$1, $1, $2
 
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
+
 	lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	mult	$13,$12
-    	mflo	$13
-    	srlv 	$1,$11,$13
-    	andi 	$1,$1,255
+	sll	$13,$13,3
+    srlv 	$1,$11,$13
+    andi 	$1,$1,255
 
 	beq	$1,$zero, BB4_4
 	nop
@@ -262,19 +260,14 @@ BB4_7:                                 #   in Loop: Header=BB4_5 Depth=1
 	addu	$1, $2, $1
 	addiu	$2, $zero, 0
 	
-        mfhi	$26
-        mflo	$27
+	
 	    addiu   $1,$1,0
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
+		
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
 	    lw	$15, 0($11)
-    	addiu 	$12,$zero,8
-	    mult	$13,$12
-    	mflo	$13
+	    sll    $13,$13,3
     	addiu	$14,$zero,24
     	sub	$13,$14,$13	#13 1->24 2->16  	
     	addiu	$14,$zero,255	#init 14
@@ -284,8 +277,7 @@ BB4_7:                                 #   in Loop: Header=BB4_5 Depth=1
     	sllv 	$1,$zero,$13	#paramater zero
     	or	$1,$1,$14
     	sw	$1,0($11)	#paramater 1
-        mthi	$26
-        mtlo	$27
+		
 	
 	sw	$2, 32($30)             # 4-byte Folded Spill
 	j	BB4_8
@@ -368,16 +360,12 @@ BB4_16:                                #   in Loop: Header=BB4_14 Depth=1
 	lw	$2, 40($30)
 	addu	$1, $1, $2
 	
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
+		
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
 	lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	mult	$13,$12
-    	mflo	$13
+	sll $13,$13,3
     	srlv 	$1,$11,$13
     	andi 	$1,$1,255
     	
@@ -387,20 +375,14 @@ BB4_16:                                #   in Loop: Header=BB4_14 Depth=1
 	
 
         #s1b	$1, 0($2)
-        mfhi	$26
-        mflo	$27
+		
         or    $23,$1,$zero  #paramater 1
 	addiu   $22,$2,0     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
+	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
 	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20	
+	sll	$20,$20,3	
     	addiu	$21,$zero,255	#init 14
     	sllv 	$21,$21,$20
     	nor	$21,$21,$zero	#14  11110000111111111
@@ -409,9 +391,6 @@ BB4_16:                                #   in Loop: Header=BB4_14 Depth=1
     	or	$22,$22,$21
     	sw	$22,0($18)	#paramater 2
         or $1,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
-
 	j	BB4_17
 	nop
 BB4_17:                                #   in Loop: Header=BB4_14 Depth=1
@@ -425,20 +404,13 @@ BB4_18:
 	addiu	$2, $30, 100
 	addu	$1, $2, $1
 	addiu	$3, $zero, 128
-        mfhi	$26
-        mflo	$27
         or    $23,$3,$zero  #paramater 1
 	addiu   $22,$1,0     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
+    	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
 	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20
+	sll	$20,$20,3
     	addiu	$21,$zero,255	#init 14
     	sllv 	$21,$21,$20
     	nor	$21,$21,$zero	#14  11110000111111111
@@ -447,43 +419,35 @@ BB4_18:
     	or	$22,$22,$21
     	sw	$22,0($18)	#paramater 2
         or $3,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
 
 	lw	$1, 168($30)
 	sll	$1, $1, 3
 	sw	$1, 36($30)
 
         addiu   $1,$30,39
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
-	    lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	    mult	$13,$12
-    	mflo	$13
+        
+    	
+    	andi	$13,$1,3
+    	srl	$11,$1,2
+    	sll	$11,$11,2
+    	
+	lw	$11, 0($11)
+    	sll	$13,$13,3
     	srlv 	$1,$11,$13
     	andi 	$1,$1,255
 
 	lw	$3, 92($30)
 	addu	$3, $2, $3
-        mfhi	$26
-        mflo	$27
+	
         or    $23,$1,$zero  #paramater 1
-	addi   $22,$3,-4     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
+	#a1ddi   $22,$3,-4     #paramater 0 2
+  addiu $22,$0,4
+  subu $22,$3,$22
+	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
 	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20
+	sll	$20,$20,3
     	addiu	$21,$zero,255	#init 14
     	sllv 	$21,$21,$20
     	nor	$21,$21,$zero	#14  11110000111111111
@@ -492,28 +456,21 @@ BB4_18:
     	or	$22,$22,$21
     	sw	$22,0($18)
         or $1,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
 
 	lhu	$1, 38($30)
 	lw	$3, 92($30)
 	addu	$3, $2, $3
 	#s1b	$1, -3($3)
 
-        mfhi	$26
-        mflo	$27
         or    $23,$1,$zero  #paramater 1
-	addi   $22,$3,-3     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
+	addiu   $22,$3,-3     #paramater 0 2
+	
+	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
+    	
 	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20
+	sll	$20,$20,3
     	addiu	$21,$zero,255	#init 14
     	sllv 	$21,$21,$20
     	nor	$21,$21,$zero	#14  11110000111111111
@@ -522,27 +479,21 @@ BB4_18:
     	or	$22,$22,$21
     	sw	$22,0($18)
         or $1,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
 
 	lw	$1, 36($30)
 	srl	$1, $1, 8
 	lw	$3, 92($30)
 	addu	$3, $2, $3
-        mfhi	$26
-        mflo	$27
+	
         or    $23,$1,$zero  #paramater 1
-	addi   $22,$3,-2     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
+	#a1ddi   $22,$3,-2     #paramater 0 2
+  addiu $22,$0,2
+  subu $22,$3,$22
+	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
 	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20
+	sll	$20,$20,3
     	addiu	$21,$zero,255	#init 14
     	sllv 	$21,$21,$20
     	nor	$21,$21,$zero	#14  11110000111111111
@@ -551,26 +502,19 @@ BB4_18:
     	or	$22,$22,$21
     	sw	$22,0($18)
         or $1,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
 
 	lw	$1, 36($30)
 	lw	$3, 92($30)
 	addu	$2, $2, $3
-        mfhi	$26
-        mflo	$27
         or    $23,$1,$zero  #paramater 1
-	addi   $22,$2,-1     #paramater 0 2
-    	addiu 	$19,$zero,4
-    	div 	$22,$19
-    	mflo 	$18
-    	mfhi	$20
-    	mult 	$18,$19
-    	mflo	$18
+	#a1ddi   $22,$2,-1     #paramater 0 2
+  addiu $22,$0,1
+  subu $22,$2,$22
+	andi	$20,$22,3
+    	srl	$18,$22,2
+    	sll	$18,$18,2
 	lw	$28, 0($18)
-    	addiu 	$19,$zero,8
-	mult	$20,$19
-    	mflo	$20
+	sll	$20,$20,3
     	addiu	$21,$zero,255	#init 14
     	sllv 	$21,$21,$20
     	nor	$21,$21,$zero	#14  11110000111111111
@@ -579,8 +523,6 @@ BB4_18:
     	or	$22,$22,$21
     	sw	$22,0($18)
         or $1,$23,$zero #paramater 1
-        mthi	$26
-        mtlo	$27
 	sw	$zero, 88($30)
 	j	BB4_19
 	nop
@@ -645,11 +587,12 @@ BB4_27:                                #   in Loop: Header=BB4_24 Depth=1
 	nop
 BB4_28:
 	lw	$4, 48($30)
-	lw	$24, 48($30)
-	#li $v0,1
-	#syscall
+  	li $v0,1
+  	syscall
+	lui $1,4097
+  	#la	$1,.str
+	lw	$24, 0($1)
 	j gene
-	j func_end5
 func_end4:
           nop                              # -- End function
 ztransform:                             # @ztransform
@@ -874,16 +817,17 @@ BB5_3:                                 #   in Loop: Header=BB5_1 Depth=1
 	addu	$1, $1, $2
 
         addiu   $1,$1,0
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
+		
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
+		
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
+
 	    lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	    mult	$13,$12
-    	mflo	$13
+    	sll    $13,$13,3
     	srlv 	$1,$11,$13
     	andi 	$1,$1,255
 
@@ -899,16 +843,12 @@ BB5_3:                                 #   in Loop: Header=BB5_1 Depth=1
     
 
         addiu   $1,$1,1
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
+		
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
 	    lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	    mult	$13,$12
-    	mflo	$13
+    	sll    $13,$13,3
     	srlv 	$1,$11,$13
     	andi 	$1,$1,255
 
@@ -924,16 +864,12 @@ BB5_3:                                 #   in Loop: Header=BB5_1 Depth=1
 	addu	$1, $1, $2
     
         addiu   $1,$1,2
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
+		
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
 	    lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	    mult	$13,$12
-    	mflo	$13
+    	sll    $13,$13,3
     	srlv 	$1,$11,$13
     	andi 	$1,$1,255
 
@@ -949,16 +885,12 @@ BB5_3:                                 #   in Loop: Header=BB5_1 Depth=1
 	addu	$1, $1, $2
     
         addiu   $1,$1,3
-    	addiu 	$12,$zero,4
-    	div 	$1,$12
-    	mflo 	$11
-    	mfhi	$13
-    	mult 	$11,$12
-    	mflo	$11
+		
+	andi	$13,$1,3
+    srl	$11,$1,2
+    sll	$11,$11,2
 	    lw	$11, 0($11)
-    	addiu 	$12,$zero,8
-	    mult	$13,$12
-    	mflo	$13
+    	sll    $13,$13,3
     	srlv 	$1,$11,$13
     	andi 	$1,$1,255
 

@@ -20,41 +20,43 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Executs32 (Read_data_1, Read_data_2, Imme_extend, Function_opcode, opcode, ALUOp, Shamt, ALUSrc, I_format, Zero, Sftmd, ALU_Result, Addr_Result, PC_plus_4, Jr); 
+module Executs32 (
+//input fpga_clk,
 // from decoder 
-input[31:0] Read_data_1; 
+input[31:0] Read_data_1,
 //the source of Ainput 
-input[31:0] Read_data_2; 
+input[31:0] Read_data_2,
 //one of the sources of Binput 
-input[31:0] Imme_extend; 
+input[31:0] Imme_extend,
 //one of the sources of Binput 
 // from ifetch 
-input[5:0] Function_opcode; 
+input[5:0] Function_opcode,
 //instructions[5:0] 
-input[5:0] opcode; 
+input[5:0] opcode,
 //instruction[31:26] 
-input[4:0] Shamt; 
+input[4:0] Shamt,
 // instruction[10:6], the amount of shift bits 
-input[31:0] PC_plus_4; 
+input[31:0] PC_plus_4,
 // pc+4 
 // from controller 
-input[1:0] ALUOp; 
+input[1:0] ALUOp,
 //{ (R_format || I_format) , (Branch || nBranch) } 
-input ALUSrc; 
+input ALUSrc,
 // 1 means the 2nd operand is an immedite (except beq£¬bne£© 
-input I_format; 
+input I_format,
 // 1 means I-Type instruction except beq, bne, LW, SW 
-input Sftmd; 
+input Sftmd,
 // 1 means this is a shift instruction 
-input Jr; 
+input Jr,
 // 1 means this is a jr instruction
-output Zero; 
+output Zero,
 // 1 means the ALU_result is zero, 0 otherwise 
-output reg [31:0] ALU_Result; 
+output reg [31:0] ALU_Result,
 // the ALU calculation result
-output [31:0] Addr_Result; 
+output [31:0] Addr_Result
 // the calculated instruction address
-wire[31:0] Ainput,Binput; 
+); 
+wire[31:0] Ainput,Binput;
 // two operands for calculation 
 wire[5:0] Exe_code; 
 // use to generate ALU_ctrl. (I_format==0) ? Function_opcode : { 3'b000 , Opcode[2:0] }; 
@@ -71,6 +73,37 @@ wire[32:0] Branch_Addr;
 
 reg [31:0] lo;
 reg [31:0] hi;
+/*
+reg [31:0] product_A;
+reg [31:0] product_B;
+wire [63:0] result;
+mult_ip mul(.CLK(fpga_clk),.A(product_A),.B(product_B),.P(result));
+reg from_mul;
+reg [31:0] div_A;
+reg [31:0] div_B;
+reg [31:0] A;
+reg [31:0] B;
+wire [63:0] div_result;
+reg from_div;
+reg s_axis_dividend_tvalid;
+reg s_axis_divisor_tvalid;
+div_ip div(.aclk(fpga_clk),.s_axis_divisor_tvalid(s_axis_divisor_tvalid),
+.s_axis_divisor_tdata (A),.s_axis_dividend_tvalid(s_axis_dividend_tvalid),
+.s_axis_dividend_tdata (B),.m_axis_dout_tdata (div_result));
+
+always @(posedge fpga_clk)
+begin
+if(from_div && s_axis_dividend_tvalid==0)begin 
+    A=div_A;
+    s_axis_dividend_tvalid=1;
+end
+else s_axis_dividend_tvalid=0;
+if(from_div && s_axis_divisor_tvalid==0)begin
+    B=div_B;
+    s_axis_divisor_tvalid=1;
+end
+else s_axis_divisor_tvalid=0;
+end//*/
 
 assign Ainput = Read_data_1; 
 assign Binput = (ALUSrc == 0) ? Read_data_2 : Imme_extend[31:0];
@@ -93,8 +126,9 @@ begin case (ALU_ctl)
     default:ALU_output_mux = 32'h00000000; 
 endcase 
 end
-always @* begin 
+always @(*/*Sftm or Sftmd or ALU_ctl or ALU_output_mux or I_format or Exe_code*/) begin 
     if(Sftmd) 
+    begin
         case(Sftm[5:0]) 
             6'b0000:Shift_Result = Binput << Shamt; //Sll rd,rt,shamt 00000 
             6'b0010:Shift_Result = Binput >> Shamt; //Srl rd,rt,shamt 00010 
@@ -103,32 +137,44 @@ always @* begin
             6'b0011:Shift_Result = $signed(Binput) >>> Shamt; //Sra rd,rt,shamt 00011 
             6'b0111:Shift_Result = $signed(Binput) >>> Ainput; //Srav rd,rt,rs 00111 
             6'b11010:begin//div rs rt
-            hi=(Ainput % Binput);
-            lo=(Ainput / Binput);
+                 //div_A=Ainput;
+                 //div_B=Binput;
+                 hi = Ainput % Binput;
+                 lo = Ainput / Binput;
+                 //from_div=1;
+                 //from_mul=0;
             end
             6'b11000:begin//mult rs rt
-            {hi,lo}=Binput * Ainput;
+            {hi,lo} = Ainput* Binput;
+                 //product_A=Ainput;
+                 //product_B=Binput;
+                 //from_mul=1;
+                 //from_div=0;
             end
             6'b10000:begin//mfhi rd
+            //if(from_mul){hi,lo}=result;
+            //if(from_div){hi,lo}=div_result;
             Shift_Result = hi;
             end
             6'b10010:begin//mflo rd
+            //if(from_mul){hi,lo}=result;
+            //if(from_div){hi,lo}=div_result;
             Shift_Result = lo;
             end
             6'b10001:begin//mthi  rs
             hi = Ainput;
+            //from_mul=0;
+            //from_div=0;
             end
             6'b10011:begin//mtlo  rs
             lo = Ainput;
+            //from_mul=0;
+            //from_div=0;
             end
 
             default:Shift_Result = Binput; 
-        endcase 
+        endcase end
     else Shift_Result = Binput; 
-end
-
-always @* begin 
-//set type operation (slt, slti, sltu, sltiu) 
 if(((ALU_ctl==3'b111) && (Exe_code[3]==1))||((ALU_ctl[2:1]==2'b11) && (I_format==1))) ALU_Result = ALU_output_mux[31]==1 ? 1:0; 
 //lui operation 
 else if((ALU_ctl==3'b101) && (I_format==1)) ALU_Result[31:0]={Binput[15:0],{16{1'b0}}}; 

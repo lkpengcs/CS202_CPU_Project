@@ -61,7 +61,7 @@ cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk1),.clk_out2(upg_clk_o));
 
 reg[31:0] low_clk;
 always @(posedge upg_clk1)low_clk=low_clk+1;
-assign upg_clk=low_clk[24];//upg_clk1;//
+assign upg_clk=low_clk[8];//upg_clk1;//
 //1010 1010 1010 1010
 
 wire clkout=low_clk[12];
@@ -130,7 +130,7 @@ wire[4:0] Shamt_w=Instruction_w[10:6];
 wire[31:0] PC_plus_4_w; //bind ifetc 
 wire Zero_w; //bind ifetc
 wire [31:0] Addr_result_w;//bind ifetc
-Executs32 executs(.Read_data_1(Read_data_1_w), .Read_data_2(ram_dat_i_w), .Imme_extend(Imme_extend_w),
+Executs32 executs(/*.fpga_clk(low_clk[12]),*/.Read_data_1(Read_data_1_w), .Read_data_2(ram_dat_i_w), .Imme_extend(Imme_extend_w),
 .Function_opcode(Function_opcode_w), .opcode(Opcode_w), .ALUOp(ALUOp_w),
 .Shamt(Shamt_w), .ALUSrc(ALUSrc_w), .I_format(I_format_w), .Zero(Zero_w), .Sftmd(Sftmd_w),
 .ALU_Result(ram_adr_w), .Addr_Result(Addr_result_w), .PC_plus_4(PC_plus_4_w), .Jr(Jr_w));
@@ -140,8 +140,8 @@ wire [31:0] input_t9;
 wire use_outter_t9;
 assign input_t9=switch2N4[22:0];
 assign use_outter_t9=switch2N4[23];
-assign led2N4=show_t8[23:0];//{upg_rst,cpu_clk,pco_w[21:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]PC_plus_4_w;//show_t8[23:0];
-assign data=Instruction_o_w;//show_t8;//
+assign led2N4=PC_plus_4_w;//show_t8[23:0];//{upg_rst,cpu_clk,pco_w[21:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]PC_plus_4_w;//show_t8[23:0];
+assign data=show_t8;//Instruction_o_w;//
 //
 
 wire [31:0] opcplus4_w;//bind ifetc
