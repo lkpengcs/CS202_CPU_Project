@@ -12,7 +12,8 @@ module Idecode32(
     input        clock,
     input        reset,
     input[31:0]  opcplus4,
-    output reg[31:0] ram_reg_o,
+        output reg[31:0] ram_reg_o,
+        output reg[31:0] ram_reg_o2,
     input outter_input,
     input [31:0] outter_t9
 );
@@ -25,7 +26,7 @@ wire[15:0] immediate= Instruction[15:0];
 
 reg[31:0] register[0:31];
 
-reg[4:0] write_reg;
+wire[4:0] write_reg = (6'b000011 == opcode & Jal)?5'b11111:(RegDst)?rd:rt;
 reg[31:0] write_data;
 
 integer i;
@@ -36,9 +37,9 @@ always @(posedge clock) begin
     end
     else begin
         ram_reg_o<= register[24];
+        ram_reg_o2<=register[26];
         if(outter_input) register[25]<=outter_t9;
-        write_reg <= (6'b000011 == opcode & Jal)?5'b11111:(RegDst)?rd:rt;
-        if((RegWrite | Jal) & write_reg != 0) begin
+        if((RegWrite || Jal) && write_reg != 0) begin
             register[write_reg] <= ((6'b000011 == opcode && 1'b1 == Jal)?opcplus4:(MemtoReg?read_data:ALU_result));
         end
     end

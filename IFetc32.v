@@ -20,13 +20,14 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
+
 module Ifetc32(Instruction_out,branch_base_addr,Addr_result,
             Read_data_1,Branch,nBranch,Jmp,Jal,Jr,Zero,
             clock,reset,link_addr,pco, Instruction); 
 output[31:0] Instruction_out; // the instruction fetched from this module 
 output[31:0] branch_base_addr; // (pc+4) to ALU which is used by branch type instruction 
 output reg [31:0] link_addr; // (pc+4) to decoder which is used by jal instruction 
-output reg [31:0] pco;
+output[31:0] pco;
 input clock,reset; // Clock and reset 
 // from ALU 
 input[31:0] Addr_result; // the calculated address from ALU 
@@ -40,36 +41,27 @@ input Jmp; // while Jmp 1,it means current instruction is jump
 input Jal; // while Jal is 1,it means current instruction is jal 
 input Jr; // while Jr is 1,it means current instruction is jr
 input [31:0] Instruction;
+reg[31:0] PC, Next_PC; 
 
-reg[31:0] next_PC;
-assign branch_base_addr = pco + 4;
-
-
-always @(Jal or Jmp or clock) begin
-    if(Jmp == 1 || Jal == 1)begin
-        link_addr <= (pco + 4) >> 2;
-    end
+always @(Branch or nBranch or Zero or Addr_result or Read_data_1 or Jr or Jmp or Jal or PC or Instruction) begin 
+    if(((Branch == 1) && (Zero == 1 )) || ((nBranch == 1) && (Zero == 0))) // beq, bne 
+        Next_PC = Addr_result << 2; // the calculated new value for PC 
+    else if(Jr == 1) Next_PC = Read_data_1 << 2; // the value of $31 register 
+    else if ((Jmp == 1) || (Jal == 1)) Next_PC = {PC[31:28], Instruction[25:0], 2'b00};
+    else Next_PC = PC + 4; // PC+4 
+end 
+always @( negedge clock) begin 
+    if(reset == 1) PC <= 32'h0000_0000; 
+    else PC <= Next_PC; 
 end
-
-always @(negedge clock) begin
-    if(reset)begin
-        pco <= 32'h0000_0000;
-    end
-    else begin
-        if((Branch == 1 && Zero == 1)||(nBranch == 1 && Zero == 0))begin
-            pco <= Addr_result<< 2;// the calculated new value for PC
-        end
-        else if(Jr)begin
-            pco <= Read_data_1<< 2;// the value of $31 register
-        end
-        else if ((Jmp == 1) || (Jal == 1))begin
-            pco <= {pco[31:28], Instruction[25:0], 2'b00};
-        end
-        else begin
-            pco <= pco+4;// PC+4
-        end
-    end
+always @(negedge clock)
+begin
+    if ((Jmp == 1) || (Jal == 1)) 
+        link_addr <= (PC + 4) >> 2;
+    else
+        link_addr <= link_addr;
 end
-
+assign branch_base_addr = PC + 4;
+assign pco = PC;
 assign Instruction_out = Instruction;
 endmodule

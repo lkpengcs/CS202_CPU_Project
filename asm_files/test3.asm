@@ -1,13 +1,42 @@
 .data
-.str: .asciiz	"0834876DCFB05CB167A5C24953EBA58C"
+.str: .asciiz	"0834876DCFB05CB167A5C24953EB"
 string	: .space 1024
 temp	: .space 1024
-rec	: .word 0x00
 .text 
 start:
 nop
 gene:
-	addiu $t5,$25,0
+addi $1,$0,0
+addi $2,$0,0
+addi $3,$0,0
+addi $4,$0,0
+addi $5,$0,0
+addi $6,$0,0
+addi $7,$0,0
+addi $8,$0,0
+addi $9,$0,0
+addi $10,$0,0
+addi $11,$0,0
+addi $12,$0,0
+addi $13,$0,0
+addi $14,$0,0
+addi $15,$0,0
+addi $16,$0,0
+addi $17,$0,0
+addi $18,$0,0
+addi $19,$0,0
+addi $20,$0,0
+addi $21,$0,0
+addi $22,$0,0
+addi $23,$0,0
+lui $27, 4097
+ori $27,$27, 12800
+addi $28,$0,0
+addi $30,$0,0
+addi $31,$0,0
+	addiu $t5,$25,123
+	lui $t1,4097
+	ori $t2,$t1,1056
 	lui $t1,4097
 	ori $t2,$t1,1057
 	#la $t2,string#############################
@@ -33,13 +62,14 @@ bne $1,$0,sjmp1
 		addiu $22,$22,1
 		sjmp1:
 		addu $t6,$22,$zero	#t6=$22 + ($23 > 9);
-		addu $t5,$t6,$zero
+		addu $26,$t6,$0
+		#addu $t5,$t6,$zero
 		sll $22,$t6,3
 		sll $t6,$t6,1
 		addu $t6,$t6,$22
 		subu $t6,$t5,$t6
-
 		addiu $t6, $t6, 48
+		addu $t5,$26,$0
 
         or    $23,$t6,$zero  #paramater 1
 	addiu   $22,$t2,0     #paramater 0 2
@@ -93,122 +123,130 @@ bne $1,$0,sjmp1
 	j main
 
 ROTR:                                   # @ROTR
-	addiu $29, $29, -24
+    addiu $19,$0,24
+    sub $27,$27,$19
 	addu	$1,$zero,$5
 	addu	$2,$zero,$4
-	sw	$4, 20($29)
-	sw	$5, 16($29)
-	lw	$4, 20($29)
-	lw	$5, 16($29)
+	sw	$4, 20($27)
+	sw	$5, 16($27)
+	lw	$4, 20($27)
+	lw	$5, 16($27)
 	srlv	$4, $4, $5
-	sw	$4, 12($29)
-	lw	$4, 16($29)
+	sw	$4, 12($27)
+	lw	$4, 16($27)
 	addiu	$5, $zero, 32
 	subu	$4, $5, $4
-	sw	$4, 8($29)
-	lw	$4, 20($29)
-	lw	$5, 8($29)
+	sw	$4, 8($27)
+	lw	$4, 20($27)
+	lw	$5, 8($27)
 	sllv	$4, $4, $5
-	lw	$5, 12($29)
+	lw	$5, 12($27)
 	or	$4, $5, $4
-	sw	$4, 12($29)
-	lw	$4, 12($29)
-	sw	$2, 4($29)              # 4-byte Folded Spill
+	sw	$4, 12($27)
+	lw	$4, 12($27)
+	sw	$2, 4($27)              # 4-byte Folded Spill
 	addu	$2,$zero,$4
-	sw	$1, 0($29)              # 4-byte Folded Spill
-	addiu	$29, $29, 24
+	sw	$1, 0($27)              # 4-byte Folded Spill
+	
+	
+	
+	addiu	$27, $27, 24
 	jr	$ra
 	nop
 func_end0:
-	addiu	$29, $29, -24
+    addiu $19,$0,24
+    sub $27,$27,$19
 	addu	$1,$zero,$5
 	addu	$2,$zero,$4
-	sw	$4, 20($29)
-	sw	$5, 16($29)
-	lw	$4, 20($29)
-	lw	$5, 16($29)
+	sw	$4, 20($27)
+	sw	$5, 16($27)
+	lw	$4, 20($27)
+	lw	$5, 16($27)
 	srlv	$4, $4, $5
-	sw	$4, 12($29)
-	lw	$4, 12($29)
-	sw	$2, 8($29)              # 4-byte Folded Spill
+	sw	$4, 12($27)
+	lw	$4, 12($27)
+	sw	$2, 8($27)              # 4-byte Folded Spill
 	addu	$2,$zero,$4
-	sw	$1, 4($29)              # 4-byte Folded Spill
-	addiu	$29, $29, 24
+	sw	$1, 4($27)              # 4-byte Folded Spill
+	addiu	$27, $27, 24
 	jr	$ra
 	nop
 	
 CHX:                                    # @CHX
-	addiu	$29, $29, -32
+    addiu $19,$0,32
+    sub $27,$27,$19
 	addu	$1,$zero,$6
 	addu	$2,$zero,$5
 	addu	$3,$zero,$4
-	sw	$4, 28($29)
-	sw	$5, 24($29)
-	sw	$6, 20($29)
-	lw	$4, 28($29)
-	lw	$5, 24($29)
+	sw	$4, 28($27)
+	sw	$5, 24($27)
+	sw	$6, 20($27)
+	lw	$4, 28($27)
+	lw	$5, 24($27)
 	and	$4, $4, $5
-	sw	$4, 16($29)
-	lw	$4, 28($29)
+	sw	$4, 16($27)
+	lw	$4, 28($27)
 	nor	$4, $4, $0
-	lw	$5, 20($29)
+	lw	$5, 20($27)
 	and	$4, $4, $5
-	sw	$4, 12($29)
-	lw	$4, 12($29)
-	lw	$5, 16($29)
+	sw	$4, 12($27)
+	lw	$4, 12($27)
+	lw	$5, 16($27)
 	xor	$4, $5, $4
-	sw	$4, 16($29)
-	lw	$4, 16($29)
-	sw	$2, 8($29)              # 4-byte Folded Spill
+	sw	$4, 16($27)
+	lw	$4, 16($27)
+	sw	$2, 8($27)              # 4-byte Folded Spill
 	addu	$2,$zero,$4
-	sw	$1, 4($29)              # 4-byte Folded Spill
-	sw	$3, 0($29)              # 4-byte Folded Spill
-	addiu	$29, $29, 32
+	sw	$1, 4($27)              # 4-byte Folded Spill
+	sw	$3, 0($27)              # 4-byte Folded Spill
+	addiu	$27, $27, 32
 	jr	$ra
 	nop
 	
 MAJ:                                    # @MAJ
-	addiu	$29, $29, -32
+    addiu $19,$0,32
+    sub $27,$27,$19
 	addu	$1,$zero,$6
 	addu	$2,$zero,$5
 	addu	$3,$zero,$4
-	sw	$4, 28($29)
-	sw	$5, 24($29)
-	sw	$6, 20($29)
-	lw	$4, 28($29)
-	lw	$5, 24($29)
+	sw	$4, 28($27)
+	sw	$5, 24($27)
+	sw	$6, 20($27)
+	lw	$4, 28($27)
+	lw	$5, 24($27)
 	and	$4, $4, $5
-	sw	$4, 16($29)
-	lw	$4, 28($29)
-	lw	$5, 20($29)
+	sw	$4, 16($27)
+	lw	$4, 28($27)
+	lw	$5, 20($27)
 	and	$4, $4, $5
-	sw	$4, 12($29)
-	lw	$4, 12($29)
-	lw	$5, 16($29)
+	sw	$4, 12($27)
+	lw	$4, 12($27)
+	lw	$5, 16($27)
 	xor	$4, $5, $4
-	sw	$4, 16($29)
-	lw	$4, 24($29)
-	lw	$5, 20($29)
+	sw	$4, 16($27)
+	lw	$4, 24($27)
+	lw	$5, 20($27)
 	and	$4, $4, $5
-	sw	$4, 12($29)
-	lw	$4, 12($29)
-	lw	$5, 16($29)
+	sw	$4, 12($27)
+	lw	$4, 12($27)
+	lw	$5, 16($27)
 	xor	$4, $5, $4
-	sw	$4, 16($29)
-	lw	$4, 16($29)
-	sw	$2, 8($29)              # 4-byte Folded Spill
+	sw	$4, 16($27)
+	lw	$4, 16($27)
+	sw	$2, 8($27)              # 4-byte Folded Spill
 	addu	$2,$zero,$4
-	sw	$1, 4($29)              # 4-byte Folded Spill
-	sw	$3, 0($29)              # 4-byte Folded Spill
-	addiu	$29, $29, 32
+	sw	$1, 4($27)              # 4-byte Folded Spill
+	sw	$3, 0($27)              # 4-byte Folded Spill
+	addiu	$27, $27, 32
 	jr	$ra
 	nop
 
 main:                                   # @main
-	addiu	$29, $29, -192
-	sw	$ra, 188($29)           # 4-byte Folded Spill
-	sw	$30, 184($29)           # 4-byte Folded Spill
-	addu	$30,$zero,$29
+    addiu $19,$0,192
+    sub $27,$27,$19
+	sw	$ra, 188($27)           # 4-byte Folded Spill
+	sw	$30, 184($27)           # 4-byte Folded Spill
+	addu	$30,$zero,$27
 	sw	$zero, 180($30)
 	lui $1,4097
 	sw	$1, 176($30)
@@ -227,10 +265,11 @@ BB4_1:                                 # =>This Inner Loop Header: Depth=1
     sll	$11,$11,2
 
 	lw	$11, 0($11)
+	
+	
 	sll	$13,$13,3
     srlv 	$1,$11,$13
     andi 	$1,$1,255
-
 	beq	$1,$zero, BB4_4
 	nop
 	j	BB4_3
@@ -390,6 +429,8 @@ BB4_16:                                #   in Loop: Header=BB4_14 Depth=1
     	sllv 	$22,$23,$20	
     	or	$22,$22,$21
     	sw	$22,0($18)	#paramater 2
+    	
+    	
         or $1,$23,$zero #paramater 1
 	j	BB4_17
 	nop
@@ -463,7 +504,9 @@ BB4_18:
 	#s1b	$1, -3($3)
 
         or    $23,$1,$zero  #paramater 1
-	addiu   $22,$3,-3     #paramater 0 2
+        addiu $19,$0,3
+        sub $22,$3,$19 #fix 18.17
+	#addiu   $22,$3,-3     #paramater 0 2
 	
 	andi	$20,$22,3
     	srl	$18,$22,2
@@ -553,9 +596,9 @@ BB4_22:                                #   in Loop: Header=BB4_19 Depth=1
 	nop
 BB4_23:
 	addiu	$1, $30, 100
-	sw	$1, 164($30)
+	sw	$1, 164($30)	#tmp = cover_data;
 	lw	$1, 92($30)
-	srl	$1, $1, 6
+	srl	$1, $1, 6	#n = cover_size >> 6;
 	sw	$1, 84($30)
 	sw	$zero, 88($30)
 	j	BB4_24
@@ -587,19 +630,21 @@ BB4_27:                                #   in Loop: Header=BB4_24 Depth=1
 	nop
 BB4_28:
 	lw	$4, 48($30)
-  	li $v0,1
-  	syscall
-	lui $1,4097
-  	#la	$1,.str
-	lw	$24, 0($1)
+	lw	$24, 48($30)
+	#lw	$26,44($30)
+	#move $4,$24
+  	#li $v0,1
+  	#syscall
+	#lw	$26, 0($1)
 	j gene
 func_end4:
           nop                              # -- End function
 ztransform:                             # @ztransform
-	addiu	$29, $29, -648
-	sw	$ra, 644($29)           # 4-byte Folded Spill
-	sw	$30, 640($29)           # 4-byte Folded Spill
-	addu	$30,$zero,$29
+    addiu $19,$0,648
+    sub $27,$27,$19
+	sw	$ra, 644($27)           # 4-byte Folded Spill
+	sw	$30, 640($27)           # 4-byte Folded Spill
+	addu	$30,$zero,$27
 	addu	$1,$zero,$5
 	addu	$2,$zero,$4
 	sw $4, 636($30)
@@ -612,7 +657,9 @@ lui $4, 28983
 ori $4,  $4, 17553
 sw $4, 380($30)
 lui $4, 0xb5c0
-addiu $4,  $4, 0xfbcf
+lui $1,0x0
+ori $1,$1,0xfbcf
+addu $4,$4,$1 
 sw $4, 384($30)
 lui $4, 0xe9b5
 ori $4,  $4, 0xdba5
@@ -756,7 +803,9 @@ lui $4, 7735
 ori $4,  $4, 27656
 sw $4, 572($30)
 lui $4, 10056
+
 ori $4,  $4, 30540
+
 sw $4, 576($30)
 lui $4, 13488
 ori $4,  $4, 0xbcb5
@@ -767,6 +816,7 @@ sw $4, 584($30)
 lui $4, 20184
 ori $4,  $4, 0xaa4a
 sw $4, 588($30)
+
 lui $4, 23452
 ori $4,  $4, 0xca4f
 sw $4, 592($30)
@@ -959,7 +1009,8 @@ BB5_8:                                 #   in Loop: Header=BB5_6 Depth=1
 	sll	$2, $2, 2
 	lw	$4, 60($30)             # 4-byte Folded Reload
 	addu	$2, $4, $2
-	sw	$1, 0($2)
+	sw	$1, 0($2)  #
+	
 	lw	$1, 76($30)
 	sll	$1, $1, 2
 	addu	$1, $4, $1
@@ -971,7 +1022,9 @@ BB5_8:                                 #   in Loop: Header=BB5_6 Depth=1
 	sll	$1, $1, 2
 	addu	$1, $4, $1
 	lw	$4, -60($1)
-	addiu	$5, $zero, 7
+
+	addiu	$5, $0, 7
+
 	jal	ROTR
 	nop
 	lw	$1, 76($30)
@@ -1002,8 +1055,9 @@ BB5_8:                                 #   in Loop: Header=BB5_6 Depth=1
 	addu	$2, $4, $2
 	lw	$5, 0($2)
 	addu	$1, $5, $1
-	sw	$1, 0($2)
+	sw	$1, 0($2)	#correct
 	lw	$1, 76($30)
+	
 	sll	$1, $1, 2
 	addu	$1, $4, $1
 	lw	$2, -64($1)
@@ -1142,6 +1196,21 @@ BB5_13:                                #   in Loop: Header=BB5_11 Depth=1
 	lw	$2, 80($30)
 	addu	$1, $1, $2
 	sw	$1, 116($30)
+	
+	#lw	$24,116($30)
+	#addi 	$24,$1,0
+	#lw	$26,44($30)
+	#addi	$26,$4,0
+	#addi	$4,$24,0
+	#li	$v0,1
+	#syscall
+	#li	$a0,0xa
+	#li	$v0,0xb
+	#syscall
+	#dead:
+	addi	$4,$26,0
+	#j dead
+	
 	j	BB5_14
 	nop
 BB5_14:                                #   in Loop: Header=BB5_11 Depth=1
@@ -1192,13 +1261,12 @@ BB5_15:
 	addu	$1, $3, $1
 	sw	$1, 28($2)
 	addiu	$2, $zero, 0
-	addu	$29,$zero,$30
-	lw	$30, 640($29)           # 4-byte Folded Reload
-	lw	$ra, 644($29)           # 4-byte Folded Reload
-	addiu	$29, $29, 648
+	addu	$27,$zero,$30
+	lw	$30, 640($27)           # 4-byte Folded Reload
+	lw	$ra, 644($27)           # 4-byte Folded Reload
+	addiu	$27, $27, 648
 	jr	$ra
 	nop
 func_end5:
                 nop                        # -- End function
 	
-
