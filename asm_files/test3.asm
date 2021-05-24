@@ -34,11 +34,9 @@ ori $27,$27, 12800
 addi $28,$0,0
 addi $30,$0,0
 addi $31,$0,0
-	addiu $t5,$25,123
+	addi $t5,$25,0
 	lui $t1,4097
 	ori $t2,$t1,1056
-	lui $t1,4097
-	ori $t2,$t1,1057
 	#la $t2,string#############################
 	LOOP3:
 		srl $20,$t5,1	#($t5 >> 1) 
@@ -89,7 +87,7 @@ bne $1,$0,sjmp1
 
 		addiu $t2, $t2, 1
 		bgtz $t5, LOOP3
-  ori $t6,$t1,1057
+  ori $t6,$t1,1056
  # la $t6,.str#########################################################
 	REVERSE:
   addiu $11,$0,1
@@ -632,9 +630,6 @@ BB4_28:
 	lw	$4, 48($30)
 	lw	$24, 48($30)
 	#lw	$26,44($30)
-	#move $4,$24
-  	#li $v0,1
-  	#syscall
 	#lw	$26, 0($1)
 	j gene
 func_end4:
@@ -1022,8 +1017,8 @@ BB5_8:                                 #   in Loop: Header=BB5_6 Depth=1
 	sll	$1, $1, 2
 	addu	$1, $4, $1
 	lw	$4, -60($1)
+	addiu $5, $0, 7 
 
-	addiu	$5, $0, 7
 
 	jal	ROTR
 	nop
