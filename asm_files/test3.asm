@@ -34,7 +34,7 @@ ori $27,$27, 12800
 addi $28,$0,0
 addi $30,$0,0
 addi $31,$0,0
-	addi $t5,$25,0
+	addi $13,$25,100
 	lui $t1,4097
 	ori $t2,$t1,1056
 	#la $t2,string#############################
@@ -86,7 +86,7 @@ bne $1,$0,sjmp1
         or $t6,$23,$zero #paramater 1
 
 		addiu $t2, $t2, 1
-		bgtz $t5, LOOP3
+		bne $t5,$0, LOOP3
   ori $t6,$t1,1056
  # la $t6,.str#########################################################
 	REVERSE:
@@ -118,6 +118,9 @@ bne $1,$0,sjmp1
         
 		addiu $t1, $t1, 1
 		bne $t6, $t2, REVERSE
+		la $a0,.str
+		li $v0,4
+		syscall
 	j main
 
 ROTR:                                   # @ROTR
@@ -630,6 +633,9 @@ BB4_28:
 	lw	$4, 48($30)
 	lw	$24, 48($30)
 	#lw	$26,44($30)
+	move $4,$24
+  	li $v0,1
+  	syscall
 	#lw	$26, 0($1)
 	j gene
 func_end4:
@@ -1017,8 +1023,8 @@ BB5_8:                                 #   in Loop: Header=BB5_6 Depth=1
 	sll	$1, $1, 2
 	addu	$1, $4, $1
 	lw	$4, -60($1)
-	addiu $5, $0, 7 
 
+	addiu	$5, $0, 7
 
 	jal	ROTR
 	nop
@@ -1191,20 +1197,6 @@ BB5_13:                                #   in Loop: Header=BB5_11 Depth=1
 	lw	$2, 80($30)
 	addu	$1, $1, $2
 	sw	$1, 116($30)
-	
-	#lw	$24,116($30)
-	#addi 	$24,$1,0
-	#lw	$26,44($30)
-	#addi	$26,$4,0
-	#addi	$4,$24,0
-	#li	$v0,1
-	#syscall
-	#li	$a0,0xa
-	#li	$v0,0xb
-	#syscall
-	#dead:
-	addi	$4,$26,0
-	#j dead
 	
 	j	BB5_14
 	nop

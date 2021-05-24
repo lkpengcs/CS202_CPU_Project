@@ -61,7 +61,7 @@ cpuclk clk(.clk_in1(fpga_clk), .clk_out1(upg_clk1),.clk_out2(upg_clk_o));
 
 reg[31:0] low_clk;
 always @(posedge upg_clk1)low_clk=low_clk+1;
-assign upg_clk=low_clk[7];//upg_clk1;//
+assign upg_clk=low_clk[2];//upg_clk1;//
 //1010 1010 1010 1010
 
 wire clkout=low_clk[12];
@@ -141,7 +141,7 @@ wire [31:0] input_t9;
 wire use_outter_t9;
 assign input_t9=switch2N4[22:0];
 assign use_outter_t9=switch2N4[23];
-assign led2N4=show_k1[23:0];//{upg_rst,cpu_clk,pco_w[21:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]PC_plus_4_w;//show_t8[23:0];
+assign led2N4=show_t8[23:0];//{upg_rst,cpu_clk,pco_w[21:0]};//PC_plus_4_w[23:0];//pco_w[8:0],ram_adr_w[6:0]PC_plus_4_w;//show_t8[23:0];
 assign data=show_t8;//PC_plus_4_w;//show_t8;//Instruction_o_w;//
 //
 
