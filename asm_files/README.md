@@ -1,6 +1,6 @@
 # task3（如何用跑在MiniSys上artix_7里MIPS指令集的CPU挖矿  
-- ① 做一个计算sha256的C程序  
-让程序尽可能不会被优化，每行代码的操作尽量少（ref）
+- ① [做一个计算sha256的C程序](https://github.com/LinkaiPeng-SUSTech/CS202_CPU_Project/blob/master/asm_files/calc_hash.cpp)  
+让程序尽可能不会被优化，每行代码的操作尽量少
 - ② 把C程序改写成MIPS指令，一行一行改也用不了多久  
 都有C代码了为什么不去在线或者自助-target mipsel叉编？叉编的代码我们的汇编器是不能识别的，且不是所有指令我们的CPU都能处理。~~（有大佬的脚本除外~~  
 - ③ 修改我们的CPU处理不了的MIPS指令
@@ -56,7 +56,7 @@
 替换复杂指令，如     须被lui 0x1234 + ori 0x5678替代的指令addi 0x12345678   
 替换有歧义的指令，如 可被addi 0x9c40替代的指令addi 40000
 - ④ 编译上板
-程序可以按sha256算法正常计算哈希，通过（ref）验算。  
+程序可以按sha256算法正常计算哈希，通过[脚本](https://github.com/LinkaiPeng-SUSTech/CS202_CPU_Project/blob/master/asm_files/check_hash.py)验算。  
 **CPU算力约为1KH/s**,在不超频的情况下算力是RTX 3090的十万分之一，假设挖ETH，运行一天约有0.01元的毛利润(2021/5/25)。  
 
 # task3遇到的问题
