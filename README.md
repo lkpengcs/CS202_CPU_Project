@@ -1,6 +1,6 @@
 # CS202_CPU_Project
 
-# task3（如何用跑在MiniSys上artix_7里MIPS指令集的CPU挖矿  
+# 如何用跑在MiniSys上artix_7里MIPS指令集的CPU挖矿  
 - ① [做一个计算sha256的C程序](https://github.com/LinkaiPeng-SUSTech/CS202_CPU_Project/blob/master/asm_files/calc_hash.cpp)  
 让程序尽可能不会被优化，每行代码的操作尽量少
 - ② 把C程序改写成MIPS指令，一行一行改也用不了多久  
