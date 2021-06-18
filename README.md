@@ -1,5 +1,9 @@
-# CS202_CPU_Project
-
+# SUSTech-CS202_CPU_Project
+## 南科大CS202-计算机组成原理 满分(120/100)project  
+### 感谢一起完成此项目的队友：  
+- 模块和样例 **[@Linkai Peng](https://github.com/LinkaiPeng-SUSTech)**  
+- 测试和报告 **[@Linly](https://github.com/Linly1080)**  
+- 整合和挖矿 **[@Frank](https://github.com/GhostFrankWu)**  
 # 如何用跑在MiniSys上artix_7里MIPS指令集的CPU挖矿  
 - ① [做一个计算sha256的C程序](https://github.com/LinkaiPeng-SUSTech/CS202_CPU_Project/blob/master/asm_files/calc_hash.cpp)  
 让程序尽可能不会被优化，每行代码的操作尽量少
@@ -46,10 +50,10 @@
 	addiu	$21,$zero,255	#init 14
 	sllv 	$21,$21,$20
 	nor	$21,$21,$zero	#14  11110000111111111
-	and	$21,$28,$21   #14  0101000010101010
+	and	$21,$28,$21     #14  0101000010101010
 	sllv 	$22,$23,$20	
 	or	$22,$22,$21
-	sw	$22,0($18)    #paramater 2
+	sw	$22,0($18)      #paramater 2
 	or $t6,$23,$zero 	#paramater 1
 ```
 至此，我们可以在编写的CPU上完成所有Mars上可以执行的操作。
